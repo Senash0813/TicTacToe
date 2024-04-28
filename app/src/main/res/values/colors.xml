@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="add_player">#000080</color>
+    <color name="add_player_hint">#808080</color>
+    <color name="add_player_button"></color>
+    <color name="dark_blue">#191970</color>
+    <color name="dark_grey">#C0C0C0</color>
+</resources>
