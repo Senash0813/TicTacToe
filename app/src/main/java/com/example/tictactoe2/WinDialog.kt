@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 
-class WinDialog(context: Context, private val message: String, private val mainActivity: MainActivity) :
+class WinDialog(context: Context, private val message: String, private val score: Long, private val mainActivity: MainActivity) :
     Dialog(context) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,8 +16,10 @@ class WinDialog(context: Context, private val message: String, private val mainA
 
         val messageTxt = findViewById<TextView>(R.id.messageTxt)
         val startAgainBtn = findViewById<Button>(R.id.startAgainBtn)
+        val scoreTxt = findViewById<TextView>(R.id.scoreTxt)
 
         messageTxt.text = message
+        scoreTxt.text = "Score: $score"
 
         startAgainBtn.setOnClickListener {
             mainActivity.restartMatch()

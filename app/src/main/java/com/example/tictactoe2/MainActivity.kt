@@ -1,5 +1,6 @@
 package com.example.tictactoe2
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
@@ -7,6 +8,13 @@ import android.widget.LinearLayout
 import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
+
+    private val PREFS_NAME = "TicTacToePrefs"
+    private val PLAYER_ONE_SCORE_KEY = "playerOneScore"
+    private val PLAYER_TWO_SCORE_KEY = "playerTwoScore"
+
+    private var startTime: Long = 0
+    private var elapsedTime: Long = 0
 
     private val combinationsList = listOf(
         intArrayOf(0, 1, 2),
@@ -40,6 +48,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+        val playerOneScore = sharedPreferences.getLong(PLAYER_ONE_SCORE_KEY, 0)
+        val playerTwoScore = sharedPreferences.getLong(PLAYER_TWO_SCORE_KEY, 0)
 
         playerOneName = findViewById(R.id.playerOneName)
         playerTwoName = findViewById(R.id.playerTwoName)
@@ -77,6 +90,8 @@ class MainActivity : AppCompatActivity() {
         image8.setOnClickListener { clickListener(image8, 7) }
         image9.setOnClickListener { clickListener(image9, 8) }
 
+        startTime = System.currentTimeMillis()/1000
+
     }
 
     private fun performAction(imageView: ImageView, selectedBoxPosition: Int) {
@@ -84,12 +99,20 @@ class MainActivity : AppCompatActivity() {
 
         imageView.setImageResource(if (playerTurn == 1) R.drawable.cross_icon else R.drawable.zero_icon_2)
 
+        elapsedTime = (System.currentTimeMillis()/1000) - startTime
+
         if (checkPlayerWin()) {
-            val winDialog = WinDialog(this, "${if (playerTurn == 1) playerOneName.text else playerTwoName.text} has won the match", this)
+            val winDialog = WinDialog(this, "${if (playerTurn == 1) playerOneName.text else playerTwoName.text} has won the match", elapsedTime, this)
             winDialog.setCancelable(false)
             winDialog.show()
+
+
+
+            saveScore(playerTurn, elapsedTime)
+
+
         } else if (totalSelectedBoxes == 9) {
-            val winDialog = WinDialog(this, "It is a Draw", this)
+            val winDialog = WinDialog(this, "It is a Draw", 0, this)
             winDialog.setCancelable(false)
             winDialog.show()
         } else {
@@ -122,8 +145,31 @@ class MainActivity : AppCompatActivity() {
         playerTurn = 1
         totalSelectedBoxes = 1
 
+
         listOf(image1, image2, image3, image4, image5, image6, image7, image8, image9).forEach {
             it.setImageResource(R.drawable.blank_2)
         }
+
+        clearScore()
+    }
+
+    private fun saveScore(player: Int, timeTaken: Long) {
+        val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        val key = if (player == 1) PLAYER_ONE_SCORE_KEY else PLAYER_TWO_SCORE_KEY
+        val currentScore = sharedPreferences.getLong(key, 0)
+
+        editor.putLong(key, currentScore + timeTaken)
+
+        editor.apply()
+    }
+
+    private fun clearScore() {
+        val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.remove(PLAYER_ONE_SCORE_KEY)
+        editor.remove(PLAYER_TWO_SCORE_KEY)
+        editor.apply()
     }
 }
